@@ -44,7 +44,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AvaliadorTest.cs" />
+    <Compile Include="CriaLeilao.cs" />
     <Compile Include="FiltroDeLancesTest.cs" />
+    <Compile Include="LeilaoTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

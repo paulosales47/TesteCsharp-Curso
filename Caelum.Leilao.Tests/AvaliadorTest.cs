@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Caelum.Leilao.Tests;
 using NUnit.Framework;
 
 namespace Caelum.Leilao
@@ -10,150 +11,144 @@ namespace Caelum.Leilao
     [TestFixture]
     class AvaliadorTest
     {
+        private Avaliador leiloeiro;
+
+        //EXECUTADO APENAS UMA VEZ NA INICIALIZAÇÃO
+        //[OneTimeSetUp]
+        //public void ApenasInicio()
+        //{
+        //    Console.WriteLine("Inicio Unico");
+        //}
+
+        //EXECUTADO NO INICIO DE CADA TESTE
+        [SetUp]
+        public void InicializaAvaliador()
+        {
+            this.leiloeiro = new Avaliador();
+            Console.WriteLine("Iniciando testes");
+        }
+
+        //EXECUTADO SOMENTE NO FIM DE TODOS OS TESTES
+        //[OneTimeTearDown]
+        //public void ApenasFim()
+        //{
+        //    Console.WriteLine("Fim Unico");
+        //}
+
+        ////EXECUTADO AO FIM DE CADA TESTE
+        //[TearDown]
+        //public void Finaliza()
+        //{
+        //    Console.WriteLine("fim");
+        //}
+
         [Test]
         public void DeveEntenderLancesEmOrdemCrescente()
         {
-            // cenario: 3 lances em ordem crescente
-            Usuario joao = new Usuario("Joao");
-            Usuario jose = new Usuario("José");
-            Usuario maria = new Usuario("Maria");
+            Leilao leilao = new CriaLeilao("Carro")
+                .GeraUsuarios(3)
+                .Lance(0, 500.0)
+                .Lance(1, 1000.0)
+                .Lance(2, 7000.0)
+                .Leilao;
 
-            Leilao leilao = new Leilao("Playstation 3 Novo");
+            this.leiloeiro.Avalia(leilao);
 
-            leilao.Propoe(new Lance(maria, 250.0));
-            leilao.Propoe(new Lance(joao, 300.0));
-            leilao.Propoe(new Lance(jose, 400.0));
-
-            // executando a acao
-            Avaliador leiloeiro = new Avaliador();
-            leiloeiro.Avalia(leilao);
-
-            // comparando a saida com o esperado
-            double maiorEsperado = 400;
-            double menorEsperado = 250;
-
-            Assert.AreEqual(maiorEsperado, leiloeiro.MaiorLance, 0.0001);
-            Assert.AreEqual(menorEsperado, leiloeiro.MenorLance, 0.0001);
+            Assert.AreEqual(7000, this.leiloeiro.MaiorLance, 0.0001);
+            Assert.AreEqual(500, this.leiloeiro.MenorLance, 0.0001);
         }
 
         [Test]
         public void TestLanceMedio()
         {
-            // cenario: 3 lances em ordem crescente
-            Usuario joao = new Usuario("Joao");
-            Usuario jose = new Usuario("José");
-            Usuario maria = new Usuario("Maria");
+            Leilao leilao = new CriaLeilao("Carro")
+                .GeraUsuarios(3)
+                .Lance(0, 250.0)
+                .Lance(1, 300.0)
+                .Lance(2, 400.0)
+                .Leilao;
 
-            Leilao leilao = new Leilao("Playstation 3 Novo");
+            this.leiloeiro.AvaliaLanceMedio(leilao);
 
-            leilao.Propoe(new Lance(maria, 250.0));
-            leilao.Propoe(new Lance(joao, 300.0));
-            leilao.Propoe(new Lance(jose, 400.0));
-
-            // executando a acao
-            Avaliador leiloeiro = new Avaliador();
-            leiloeiro.AvaliaLanceMedio(leilao);
-
-            // comparando a saida com o esperado
             double mediaEsperada = ((400.0 + 300.0 + 250.0) / 3);
 
-
-            Assert.AreEqual(mediaEsperada, leiloeiro.MediaLance, 0.0001);
+            Assert.AreEqual(mediaEsperada, this.leiloeiro.MediaLance, 0.0001);
         }
 
         [Test]
         public void TesteUnicoLance()
         {
-            // cenario: 1 lance
-            Usuario joao = new Usuario("Joao");
-
-            Leilao leilao = new Leilao("Playstation 3 Novo");
-
-            leilao.Propoe(new Lance(joao, 200.0));
+            Leilao leilao = new CriaLeilao("Carro")
+                .GeraUsuarios(1)
+                .Lance(0, 200.0)
+                .Leilao;
 
             // executando a acao
-            Avaliador leiloeiro = new Avaliador();
-            leiloeiro.Avalia(leilao);
+            this.leiloeiro.Avalia(leilao);
 
             // comparando a saida com o esperado
-            Assert.AreEqual(200, leiloeiro.MaiorLance, 0.0001);
-            Assert.AreEqual(200, leiloeiro.MenorLance, 0.0001);
+            Assert.AreEqual(200, this.leiloeiro.MaiorLance, 0.0001);
+            Assert.AreEqual(200, this.leiloeiro.MenorLance, 0.0001);
         }
 
         [Test]
         public void TesteLancesRandom()
         {
-            // cenario: 3 lances em ordem crescente
-            Usuario joao = new Usuario("Joao");
-            Usuario jose = new Usuario("José");
-            Usuario maria = new Usuario("Maria");
+            Leilao leilao = new CriaLeilao("Carro")
+                .GeraUsuarios(3)
+                .Lance(0, 200.0)
+                .Lance(1, 450.0)
+                .Lance(2, 120.0)
+                .Lance(0, 700.0)
+                .Lance(2, 630.0)
+                .Lance(0, 230.0)
+                .Leilao;
 
-            Leilao leilao = new Leilao("Playstation 3 Novo");
-
-            leilao.Propoe(new Lance(maria, 200.0));
-            leilao.Propoe(new Lance(joao, 450.0));
-            leilao.Propoe(new Lance(jose, 120.0));
-            leilao.Propoe(new Lance(jose, 700.0));
-            leilao.Propoe(new Lance(jose, 630.0));
-            leilao.Propoe(new Lance(jose, 230.0));
-            
             // executando a acao
-            Avaliador leiloeiro = new Avaliador();
-            leiloeiro.Avalia(leilao);
+            this.leiloeiro.Avalia(leilao);
 
             // comparando a saida com o esperado
-            Assert.AreEqual(700, leiloeiro.MaiorLance, 0.0001);
-            Assert.AreEqual(120, leiloeiro.MenorLance, 0.0001);
+            Assert.AreEqual(700, this.leiloeiro.MaiorLance, 0.0001);
+            Assert.AreEqual(120, this.leiloeiro.MenorLance, 0.0001);
         }
 
         [Test]
         public void TesteLancesDecrescentes()
         {
-            // cenario: 3 lances em ordem crescente
-            Usuario joao = new Usuario("Joao");
-            Usuario jose = new Usuario("José");
-            Usuario maria = new Usuario("Maria");
-
-            Leilao leilao = new Leilao("Playstation 3 Novo");
-
-            leilao.Propoe(new Lance(maria, 700.0));
-            leilao.Propoe(new Lance(joao, 600.0));
-            leilao.Propoe(new Lance(jose, 500.0));
-            leilao.Propoe(new Lance(jose, 400.0));
-            leilao.Propoe(new Lance(jose, 300.0));
-            leilao.Propoe(new Lance(jose, 200.0));
+            Leilao leilao = new CriaLeilao("Carro")
+                .GeraUsuarios(3)
+                .Lance(0, 700.0)
+                .Lance(1, 600.0)
+                .Lance(2, 500.0)
+                .Lance(0, 400.0)
+                .Lance(2, 300.0)
+                .Lance(0, 200.0)
+                .Leilao;
 
             // executando a acao
-            Avaliador leiloeiro = new Avaliador();
-            leiloeiro.Avalia(leilao);
+            this.leiloeiro.Avalia(leilao);
 
             // comparando a saida com o esperado
-            Assert.AreEqual(700, leiloeiro.MaiorLance, 0.0001);
-            Assert.AreEqual(200, leiloeiro.MenorLance, 0.0001);
+            Assert.AreEqual(700, this.leiloeiro.MaiorLance, 0.0001);
+            Assert.AreEqual(200, this.leiloeiro.MenorLance, 0.0001);
         }
 
         [Test]
         public void TesteMaiores4Lances()
         {
-            // cenario: 3 lances em ordem crescente
-            Usuario joao = new Usuario("Joao");
-            Usuario jose = new Usuario("José");
-            Usuario maria = new Usuario("Maria");
+            Leilao leilao = new CriaLeilao("Carro")
+                .GeraUsuarios(3)
+                .Lance(0, 700.0)
+                .Lance(1, 900.0)
+                .Lance(2, 500.0)
+                .Lance(0, 400.0)
+                .Leilao;
 
-            Leilao leilao = new Leilao("Playstation 3 Novo");
-
-            leilao.Propoe(new Lance(maria, 700.0));
-            leilao.Propoe(new Lance(joao, 900.0));
-            leilao.Propoe(new Lance(jose, 500.0));
-            leilao.Propoe(new Lance(jose, 400.0));
-            
             // executando a acao
-            Avaliador leiloeiro = new Avaliador();
-            leiloeiro.Avalia(leilao);
+            this.leiloeiro.Avalia(leilao);
 
-            var lista = leiloeiro.TresMaiores;
-
-
+            var lista = this.leiloeiro.TresMaiores;
+            
             Assert.AreEqual(3, lista.Count);
             Assert.AreEqual(900, lista[0].Valor);
             Assert.AreEqual(700, lista[1].Valor);
@@ -164,20 +159,16 @@ namespace Caelum.Leilao
         [Test]
         public void TesteMaiores2Lances()
         {
-            
-            Usuario joao = new Usuario("Joao");
-            Usuario maria = new Usuario("Maria");
-
-            Leilao leilao = new Leilao("Playstation 3 Novo");
-
-            leilao.Propoe(new Lance(maria, 700.0));
-            leilao.Propoe(new Lance(joao, 900.0));
+            Leilao leilao = new CriaLeilao("Carro")
+                .GeraUsuarios(2)
+                .Lance(0, 700.0)
+                .Lance(1, 900.0)
+                .Leilao;
 
             // executando a acao
-            Avaliador leiloeiro = new Avaliador();
-            leiloeiro.Avalia(leilao);
+            this.leiloeiro.Avalia(leilao);
 
-            var lista = leiloeiro.TresMaiores;
+            var lista = this.leiloeiro.TresMaiores;
             
             Assert.AreEqual(2, lista.Count);
             Assert.AreEqual(900, lista[0].Valor);
@@ -188,23 +179,25 @@ namespace Caelum.Leilao
         [Test]
         public void TesteMaioresNenhumLance()
         {
-
-            Usuario joao = new Usuario("Joao");
-            Usuario maria = new Usuario("Maria");
-
-            Leilao leilao = new Leilao("Playstation 3 Novo");
-
-            // executando a acao
-            Avaliador leiloeiro = new Avaliador();
-            leiloeiro.Avalia(leilao);
-
-            var lista = leiloeiro.TresMaiores;
-
-            Assert.AreEqual(0, lista.Count);
-            Assert.IsEmpty(lista);
-
+            Leilao leilao = new CriaLeilao("Carro")
+                .GeraUsuarios(0)
+                .Leilao;
+            
+            Assert.Throws<ArgumentException>(() => this.leiloeiro.Avalia(leilao));
+            
         }
 
+        [Test]
+        public void TestaLanceZeroeNegativo()
+        {
+            Leilao leilao = new CriaLeilao("Carro")
+                .GeraUsuarios(2)
+                .Lance(0, 0)
+                .Lance(1, -1)
+                .Leilao;
+            
+            Assert.Throws<ArgumentException>(() => this.leiloeiro.Avalia(leilao));
+        }
 
 
     }

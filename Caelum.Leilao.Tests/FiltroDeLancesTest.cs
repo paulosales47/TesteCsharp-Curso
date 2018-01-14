@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
-namespace Caelum.Leilao.Tests
+namespace Caelum.Leilao
 {
     [TestFixture]
     public class FiltroDeLancesTest
